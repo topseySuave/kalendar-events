@@ -105,7 +105,9 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   // Fetch all events before page renders
   // @ts-ignore
-  const events = await axios.get("http://localhost:3000/api/event");
+  const events = await axios.get(
+    "https://kalendar-events.vercel.app/api/event"
+  );
 
   return {
     props: { events: events.data },
