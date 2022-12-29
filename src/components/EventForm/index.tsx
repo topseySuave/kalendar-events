@@ -90,8 +90,8 @@ function EventForm({
       formData.end_date
     ) {
       // correct date format
-      formData.start_date = new Date(formData.start_date).toISOString();
-      formData.end_date = new Date(formData.end_date).toISOString();
+      formData.start_date = new Date(formData.start_date).toISOString(); // something like "2022-12-31T00:00:00.000Z" from "2022-12-31"
+      formData.end_date = new Date(formData.end_date).toISOString(); // something like "2022-12-31T00:00:00.000Z" from "2022-12-31"
 
       // save to db
       let res: void | AxiosResponse<any, any>;
