@@ -7,7 +7,6 @@ export default async function handle(
   res: NextApiResponse
 ) {
   const id = (req.body.id as string) || (req.query.eventId as string);
-  console.log("id >>>> ", id);
   const { method } = req;
 
   switch (
