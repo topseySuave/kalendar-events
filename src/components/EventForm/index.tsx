@@ -120,6 +120,11 @@ function EventForm({
       const { data } = res as any;
       setLoading(false);
 
+      // If its in Edit mode delete event from calendar API before adding the updated one
+      if (editMode) {
+        selectInfo.event.remove();
+      }
+
       // add new event to calendar api
       calendarApi.addEvent({
         id: data.id,
