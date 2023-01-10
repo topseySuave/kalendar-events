@@ -18,7 +18,7 @@ function Modal({
 }: {
   children: ReactElement;
   openModal: boolean;
-  handleSubmit: (e: any) => void;
+  handleSubmit: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   handleDelete: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   setOpenModal: (val: boolean) => void;
   loading: boolean;

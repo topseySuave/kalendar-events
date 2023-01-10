@@ -10,7 +10,7 @@ function FormElements({
 }: {
   errorState: string;
   formData: EventData;
-  handleChange: (e: any) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   startEventStr: string;
   editMode: boolean;
 }) {

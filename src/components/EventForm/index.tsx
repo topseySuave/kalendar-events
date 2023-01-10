@@ -7,10 +7,10 @@ import FormElements from "./FormElements";
 function EventForm({
   openModal,
   setOpenModal,
-  selectInfo,
+  selectedEventInfo,
   editMode = false,
 }: {
-  selectInfo: any;
+  selectedEventInfo: any;
   openModal: boolean;
   editMode?: boolean;
   setOpenModal: (val: boolean) => void;
@@ -25,24 +25,24 @@ function EventForm({
   const [loading, setLoading] = useState(false);
   const [errorState, setErrorState] = useState(null);
 
-  // The selectInfo object is passed to the modal form when an event is clicked or a date is selected on the calendar
-  // If an event is clicked, the selectInfo object will have a startStr property or an event property
-  let startEventStr = selectInfo?.startStr ?? selectInfo?.event.startStr;
+  // The selectedEventInfo object is passed to the modal form when an event is clicked or a date is selected on the calendar
+  // If an event is clicked, the selectedEventInfo object will have a startStr property or an event property
+  let startEventStr = selectedEventInfo?.startStr ?? selectedEventInfo?.event.startStr;
 
   useEffect(() => {
-    // When the selectInfo object changes, set the form data to the selectInfo startStr object
-    if (selectInfo?.startStr) {
+    // When the selectedEventInfo object changes, set the form data to the selectedEventInfo startStr object
+    if (selectedEventInfo?.startStr) {
       setFormData({
         ...formData,
-        start_date: selectInfo?.startStr,
+        start_date: selectedEventInfo?.startStr,
       });
-    } else if (!!selectInfo) {
+    } else if (!!selectedEventInfo) {
       setFormData({
         ...formData,
-        title: selectInfo?.title,
-        description: selectInfo?.description,
-        end_date: selectInfo?.end_date?.split("T")[0],
-        start_date: selectInfo?.start_date?.split("T")[0],
+        title: selectedEventInfo?.title,
+        description: selectedEventInfo?.description,
+        end_date: selectedEventInfo?.end_date?.split("T")[0],
+        start_date: selectedEventInfo?.start_date?.split("T")[0],
       });
     }
   }, [startEventStr]);
@@ -79,8 +79,8 @@ function EventForm({
     setLoading(true);
 
     // get calendar api object
-    let calendarApi = selectInfo.view.calendar;
-    calendarApi.unselect(); // clear date selection
+    let calendarAPI = selectedEventInfo.view.calendar;
+    calendarAPI.unselect(); // clear date selection
 
     // validate form data
     if (
@@ -99,7 +99,7 @@ function EventForm({
       // if edit mode, update event in db and calendar with new data and id
       // else create new event in db and calendar
       if (editMode) {
-        formData.id = selectInfo?.id;
+        formData.id = selectedEventInfo?.id;
         res = await axios.put("/api/event", formData).catch((err) => {
           // handle error
         });
@@ -116,25 +116,26 @@ function EventForm({
         return;
       }
 
-      // distructure data from response object and set loading to false
+      // distructure data from response object
       const { data } = res as any;
-      setLoading(false);
 
-      // If its in Edit mode delete event from calendar API before adding the updated one
+      // If its in Edit mode delete the event from calendar API before adding the updated one
+      // A better way to do this would be to have an event.update() method
       if (editMode) {
-        selectInfo.event.remove();
+        selectedEventInfo.event.remove();
       }
 
-      // add new event to calendar api
-      calendarApi.addEvent({
+      // add new event to @fullcalendar/react api
+      calendarAPI.addEvent({
         id: data.id,
         title: data.title,
         start: data.start_date,
         end: data.end_date,
       });
 
-      // close modal
+      // close modal and stop loading
       setOpenModal(false);
+      setLoading(false);
     } else {
       setLoading(false);
 
@@ -149,7 +150,7 @@ function EventForm({
     setLoading(true);
     // delete from db
     const res = await axios
-      .delete(`/api/event?eventId=${selectInfo.id}`)
+      .delete(`/api/event?eventId=${selectedEventInfo.id}`)
       .catch((err) => {});
     // @ts-ignore
     if (res?.status !== 200) {
@@ -158,10 +159,10 @@ function EventForm({
       return;
     }
 
-    // Delete event from calendar API
-    selectInfo.event.remove();
+    // Delete event from @fullcalendar/react API
+    selectedEventInfo.event.remove();
 
-    // close modal
+    // close modal and stop loading
     setOpenModal(false);
     setLoading(false);
   };

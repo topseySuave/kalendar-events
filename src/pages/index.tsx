@@ -36,27 +36,28 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
       classNames: ["event-date"],
     })),
   });
-  const [selectInfo, setSelectInfo] = useState(null);
+  const [selectedEventInfo, setSelectedEventInfo] = useState(null);
 
   // Handle event click on calendar to open modal form to edit event
-  const handleEventClick = (clickInfo) => {
+  const handleEventClick = (eventInfo) => {
+    console.log('eventInfo >>>> ', eventInfo);
     setEditMode(true);
     // Find event in propEvents array to get a particular event data to pass to modal form
-    const event = findEvent(propEvents, clickInfo.event.id);
+    const event = findEvent(propEvents, eventInfo.event.id);
     setOpenModal(true);
-    setSelectInfo({
-      ...clickInfo,
+    setSelectedEventInfo({
+      ...eventInfo,
       ...event,
-      startStr: clickInfo.startStr,
-      view: clickInfo.view,
+      startStr: eventInfo.startStr,
+      view: eventInfo.view,
     });
   };
 
   // Handle date selection on calendar to open modal form to add event or edit event if editMode is true
-  const handleDateSelect = (selectInfo) => {
+  const handleDateSelect = (selectedEventInfo) => {
     setEditMode(false);
     setOpenModal(true);
-    setSelectInfo(selectInfo);
+    setSelectedEventInfo(selectedEventInfo);
   };
 
   return (
@@ -72,7 +73,7 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
           <div className="Calendar-Container">
             {/* Render Event Form modal Component */}
             <EventForm
-              selectInfo={selectInfo}
+              selectedEventInfo={selectedEventInfo}
               openModal={openModal}
               setOpenModal={setOpenModal}
               editMode={editMode}
