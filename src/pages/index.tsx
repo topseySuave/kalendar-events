@@ -46,11 +46,20 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
   // Handle event click on calendar to open modal form to edit event
   const handleEventClick = (eventInfo) => {
     setEditMode(true);
+
     // Find event in propEvents array to get a particular event data to pass to modal form
     const event = findEvent(
       state.currentEvents as unknown as EventData[],
       eventInfo.event.id
     );
+
+    /**
+     * There is a side effect where, when an event is first created without reload,
+     * the event is not added to the `currentEvents` state and this will cause the `findEvent` function to return undefined...
+     * A solution for this is the `findAndUpdateCurrentEvents` but this is also introduces a complication where the calendar view misbehaves.
+     * All these is due to the Fullcalendar Package, this issues can be solved by using a custom package or a different reliable one.
+     **/
+
     setOpenModal(true);
     const newEventInfo = {
       ...eventInfo,

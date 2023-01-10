@@ -21,7 +21,7 @@ function FormElements({
         <span className="block text-sm font-medium text-slate-700">Title</span>
         <input
           name="title"
-          defaultValue={formData.title || ""}
+          value={formData.title || ""}
           required
           onChange={handleChange}
           className="border border-slate-300 hover:border-slate-400 rounded-md w-full py-2 px-5 border-slate-200 placeholder-slate-400 contrast-more:border-slate-400 contrast-more:placeholder-slate-500"
@@ -33,7 +33,7 @@ function FormElements({
         </span>
         <textarea
           name="description"
-          defaultValue={formData.description || ""}
+          value={formData.description || ""}
           required
           onChange={handleChange}
           className="border border-slate-300 hover:border-slate-400 rounded-md w-full py-2 px-5 border-slate-200 placeholder-slate-400 contrast-more:border-slate-400 contrast-more:placeholder-slate-500"
@@ -51,7 +51,7 @@ function FormElements({
               required
               onChange={handleChange}
               min={formData.start_date}
-              value={formData.start_date}
+              defaultValue={formData.start_date}
               disabled={!!startEventStr && !editMode}
               className="border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             />
@@ -64,7 +64,7 @@ function FormElements({
               type="date"
               required
               min={formData.start_date}
-              value={formData.end_date}
+              defaultValue={formData.end_date}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             />
           </div>
