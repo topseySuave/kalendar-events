@@ -136,11 +136,6 @@ function EventForm({
       // distructure data from response object
       const { data } = res as any;
 
-      // Update the currentEvents state
-      setState({
-        currentEvents: findAndUpdateCurrentEvents(currentEvents, data.id, data),
-      });
-
       // If its in Edit mode delete the event from calendar API before adding the updated one
       // A better way to do this would be to have an event.update() method
       if (editMode) {
