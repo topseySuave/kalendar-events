@@ -1,6 +1,13 @@
 import axios, { AxiosResponse } from "axios";
-import { EventData } from "lib/types";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { findAndUpdateCurrentEvents } from "lib/functions";
+import { CurrentEventData, EventData } from "lib/types";
+import React, {
+  Dispatch,
+  SetStateAction,
+  SyntheticEvent,
+  useEffect,
+  useState,
+} from "react";
 import Modal from "../Modal";
 import FormElements from "./FormElements";
 
@@ -9,11 +16,15 @@ function EventForm({
   setOpenModal,
   selectedEventInfo,
   editMode = false,
+  setState,
+  currentEvents = [],
 }: {
   selectedEventInfo: any;
   openModal: boolean;
   editMode?: boolean;
   setOpenModal: (val: boolean) => void;
+  setState: Dispatch<SetStateAction<{ currentEvents: CurrentEventData[] }>>;
+  currentEvents: CurrentEventData[];
 }) {
   // initial state of form data
   const [formData, setFormData] = useState<EventData>({
@@ -23,14 +34,20 @@ function EventForm({
     end_date: "",
   });
   const [loading, setLoading] = useState(false);
+  // Set a new state for the delete button,
+  // so both submit and delete buttons wouldnt share the same state.
+  const [isDeleting, setIsDeleting] = useState(false);
   const [errorState, setErrorState] = useState(null);
 
   // The selectedEventInfo object is passed to the modal form when an event is clicked or a date is selected on the calendar
   // If an event is clicked, the selectedEventInfo object will have a startStr property or an event property
-  let startEventStr = selectedEventInfo?.startStr ?? selectedEventInfo?.event.startStr;
+  let startEventStr =
+    selectedEventInfo?.start_date ??
+    selectedEventInfo?.startStr ??
+    selectedEventInfo?.event.startStr;
 
   useEffect(() => {
-    // When the selectedEventInfo object changes, set the form data to the selectedEventInfo startStr object
+    // When the selectedEventInfo object changes, set the form data to the selectedEventInfo startStr string
     if (selectedEventInfo?.startStr) {
       setFormData({
         ...formData,
@@ -45,7 +62,7 @@ function EventForm({
         start_date: selectedEventInfo?.start_date?.split("T")[0],
       });
     }
-  }, [startEventStr]);
+  }, [selectedEventInfo]);
 
   // Listen for openModal state change to reset form data on close
   useEffect(() => {
@@ -119,6 +136,11 @@ function EventForm({
       // distructure data from response object
       const { data } = res as any;
 
+      // Update the currentEvents state
+      setState({
+        currentEvents: findAndUpdateCurrentEvents(currentEvents, data.id, data),
+      });
+
       // If its in Edit mode delete the event from calendar API before adding the updated one
       // A better way to do this would be to have an event.update() method
       if (editMode) {
@@ -147,7 +169,7 @@ function EventForm({
   // Handle delete event
   const handleDelete = async (e: SyntheticEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsDeleting(true);
     // delete from db
     const res = await axios
       .delete(`/api/event?eventId=${selectedEventInfo.id}`)
@@ -164,12 +186,13 @@ function EventForm({
 
     // close modal and stop loading
     setOpenModal(false);
-    setLoading(false);
+    setIsDeleting(false);
   };
 
   return (
     <Modal
       loading={loading}
+      isDeleting={isDeleting}
       handleSubmit={handleSubmit}
       openModal={openModal}
       setOpenModal={setOpenModal}

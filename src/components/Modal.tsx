@@ -1,9 +1,7 @@
 import React, {
   Fragment,
-  MouseEventHandler,
   ReactElement,
   useRef,
-  useState,
 } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
@@ -13,6 +11,7 @@ function Modal({
   children,
   handleSubmit,
   loading,
+  isDeleting,
   editMode,
   handleDelete,
 }: {
@@ -22,6 +21,7 @@ function Modal({
   handleDelete: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   setOpenModal: (val: boolean) => void;
   loading: boolean;
+  isDeleting: boolean;
   editMode?: boolean;
 }) {
   const cancelButtonRef = useRef(null);
@@ -50,13 +50,6 @@ function Modal({
             <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
-          <span
-            className="hidden sm:inline-block sm:align-middle sm:h-screen"
-            aria-hidden="true"
-          >
-            &#8203;
-          </span>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -87,7 +80,7 @@ function Modal({
                   onClick={handleSubmit}
                   disabled={loading}
                 >
-                  {loading && !editMode ? "Submitting..." : "Submit"}
+                  {loading ? "Submitting..." : "Submit"}
                 </button>
                 {editMode && (
                   <button
@@ -98,9 +91,9 @@ function Modal({
                       focus:outline-none focus:ring-2 focus:ring-offset-2
                        focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={handleDelete}
-                    disabled={loading}
+                    disabled={isDeleting}
                   >
-                    {loading ? "Deleting..." : "Delete"}
+                    {isDeleting ? "Deleting..." : "Delete"}
                   </button>
                 )}
                 <button

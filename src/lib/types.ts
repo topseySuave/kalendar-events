@@ -6,3 +6,12 @@ export type EventData = {
   end_date: string;
   isDeleted?: boolean;
 };
+
+export type CurrentEventData = {
+  id?: string;
+  title: string;
+  description: string;
+  date: string;
+  end: string;
+  classNames?: string[];
+};

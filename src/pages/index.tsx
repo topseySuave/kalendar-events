@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { GetServerSideProps } from "next";
 import Layout from "../components/Layout";
 import axios from "axios";
-import { EventData } from "lib/types";
+import { CurrentEventData, EventData } from "lib/types";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -26,13 +26,18 @@ function renderEventContent(eventInfo) {
 const App: React.FC<Props> = ({ events: propEvents }) => {
   const [openModal, setOpenModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [state, setState] = React.useState({
+  const [state, setState] = React.useState<{
+    currentEvents: CurrentEventData[];
+  }>({
     // Set initial state of calendar events to propEvents from server
     currentEvents: propEvents.map((event) => ({
       id: event.id,
       title: event.title,
+      description: event.description,
       date: event.start_date,
       end: event.end_date,
+      start_date: event.start_date,
+      end_date: event.end_date,
       classNames: ["event-date"],
     })),
   });
@@ -40,17 +45,20 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
 
   // Handle event click on calendar to open modal form to edit event
   const handleEventClick = (eventInfo) => {
-    console.log('eventInfo >>>> ', eventInfo);
     setEditMode(true);
     // Find event in propEvents array to get a particular event data to pass to modal form
-    const event = findEvent(propEvents, eventInfo.event.id);
+    const event = findEvent(
+      state.currentEvents as unknown as EventData[],
+      eventInfo.event.id
+    );
     setOpenModal(true);
-    setSelectedEventInfo({
+    const newEventInfo = {
       ...eventInfo,
       ...event,
       startStr: eventInfo.startStr,
       view: eventInfo.view,
-    });
+    };
+    setSelectedEventInfo(newEventInfo);
   };
 
   // Handle date selection on calendar to open modal form to add event or edit event if editMode is true
@@ -77,6 +85,8 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
               openModal={openModal}
               setOpenModal={setOpenModal}
               editMode={editMode}
+              setState={setState}
+              currentEvents={state.currentEvents}
             />
 
             {/* Render Calendar Component */}
@@ -105,14 +115,18 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   // Fetch all events before page renders
-  // @ts-ignore
-  const events = await axios.get(
-    "https://kalendar-events.vercel.app/api/event"
-  );
+  try {
+    // @ts-ignore
+    const events = await axios.get(
+      "https://kalendar-events.vercel.app/api/event"
+    );
 
-  return {
-    props: { events: events.data },
-  };
+    return {
+      props: { events: events.data },
+    };
+  } catch (error) {
+    return { props: {} };
+  }
 };
 
 export default React.memo(App);
