@@ -30,7 +30,7 @@ const App: React.FC<Props> = ({ events: propEvents }) => {
     currentEvents: CurrentEventData[];
   }>({
     // Set initial state of calendar events to propEvents from server
-    currentEvents: propEvents.map((event) => ({
+    currentEvents: propEvents?.map((event) => ({
       id: event.id,
       title: event.title,
       description: event.description,
