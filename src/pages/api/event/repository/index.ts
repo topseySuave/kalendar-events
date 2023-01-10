@@ -42,7 +42,6 @@ export default class EventRepository {
       const events = await EventServices.getAllEvent(params);
       return events;
     } catch (error) {
-      console.log('error >> ', error);
       throw new Error(error);
     }
   }
